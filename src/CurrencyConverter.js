@@ -16,7 +16,7 @@ const CurrencyConverter = () => {
     useEffect(() => {
         const fetchCurrencies = async () => {
             try {
-                const response = await axios.get('http://{LOAD_BALANCER_IP}:3000/currencies');
+                const response = await axios.get('http://${LOAD_BALANCER_IP}:3000/currencies');
                 const fetchedCurrencies = Object.keys(response.data.rates);
                 setCurrencies(fetchedCurrencies);
                 setRates(response.data.rates);
