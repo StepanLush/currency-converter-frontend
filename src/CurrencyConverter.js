@@ -14,9 +14,11 @@ const CurrencyConverter = () => {
     );
 
     useEffect(() => {
+        const API_URL = process.env.REACT_APP_API_URL;
+
         const fetchCurrencies = async () => {
             try {
-                const response = await axios.get('http://23.96.60.215:3000/currencies');
+                const response = await axios.get(API_URL);
                 const fetchedCurrencies = Object.keys(response.data.rates);
                 setCurrencies(fetchedCurrencies);
                 setRates(response.data.rates);
