@@ -40,30 +40,30 @@ const CurrencyConverter = () => {
         localStorage.setItem('favorites', JSON.stringify(favorites));
     }, [from, to, fromAmount, favorites]);
 
+    useEffect(() => {
+        if (fromAmount && rates[to] && rates[from]) {
+            const converted = (fromAmount * rates[to] / rates[from]).toFixed(2);
+            setToAmount(converted);
+        }
+    }, [from, to, rates, fromAmount]);
+
+    useEffect(() => {
+        if (toAmount && rates[to] && rates[from]) {
+            const converted = (toAmount * rates[from] / rates[to]).toFixed(2);
+            setFromAmount(converted);
+        }
+    }, [from, to, rates, toAmount]);
+
     const handleAmountInput = (value) => {
         return value.replace(/[^0-9.]/g, '');
     };
 
     const handleFromAmountChange = (amount) => {
-        const sanitizedAmount = handleAmountInput(amount);
-        setFromAmount(sanitizedAmount);
-        if (sanitizedAmount && rates[to] && rates[from]) {
-            const converted = (sanitizedAmount * rates[to] / rates[from]).toFixed(2);
-            setToAmount(converted);
-        } else {
-            setToAmount('');
-        }
+        setFromAmount(handleAmountInput(amount));
     };
 
     const handleToAmountChange = (amount) => {
-        const sanitizedAmount = handleAmountInput(amount);
-        setToAmount(sanitizedAmount);
-        if (sanitizedAmount && rates[to] && rates[from]) {
-            const converted = (sanitizedAmount * rates[from] / rates[to]).toFixed(2);
-            setFromAmount(converted);
-        } else {
-            setFromAmount('');
-        }
+        setToAmount(handleAmountInput(amount));
     };
 
     const handleFavoriteToggle = (currency) => {
@@ -77,20 +77,6 @@ const CurrencyConverter = () => {
 
     const sortedCurrencies = [...favorites, ...currencies.filter((c) => !favorites.includes(c))];
 
-    const handleFromCurrencyChange = (currency) => {
-        setFrom(currency);
-        if (fromAmount) {
-            handleFromAmountChange(fromAmount);
-        }
-    };
-
-    const handleToCurrencyChange = (currency) => {
-        setTo(currency);
-        if (toAmount) {
-            handleToAmountChange(toAmount);
-        }
-    };
-
     return (
         <div className="currency-converter">
             <h1>Currency Converter</h1>
@@ -103,7 +89,7 @@ const CurrencyConverter = () => {
                     placeholder="Amount"
                 />
                 <div className="currency-select">
-                    <select value={from} onChange={(e) => handleFromCurrencyChange(e.target.value)}>
+                    <select value={from} onChange={(e) => setFrom(e.target.value)}>
                         {sortedCurrencies.map((currency) => (
                             <option key={currency} value={currency}>
                                 {favorites.includes(currency) ? `★ ${currency}` : currency} - {currencyNames[currency] || 'Unknown'}
@@ -127,7 +113,7 @@ const CurrencyConverter = () => {
                     placeholder="Converted Amount"
                 />
                 <div className="currency-select">
-                    <select value={to} onChange={(e) => handleToCurrencyChange(e.target.value)}>
+                    <select value={to} onChange={(e) => setTo(e.target.value)}>
                         {sortedCurrencies.map((currency) => (
                             <option key={currency} value={currency}>
                                 {favorites.includes(currency) ? `★ ${currency}` : currency} - {currencyNames[currency] || 'Unknown'}
