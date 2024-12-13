@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import currencyNames from './currencyNames';
+import './CurrencyConverter.css';
 
 const CurrencyConverter = () => {
     const [currencies, setCurrencies] = useState([]);
@@ -14,7 +15,7 @@ const CurrencyConverter = () => {
     );
 
     useEffect(() => {
-        const API_URL = process.env.REACT_APP_API_URL;
+        const API_URL = `${process.env.REACT_APP_API_URL}/currencies`;
 
         const fetchCurrencies = async () => {
             try {
@@ -114,8 +115,9 @@ const CurrencyConverter = () => {
                 <input
                     type="text"
                     value={toAmount}
-                    onChange={(e) => handleFromAmountChange(fromAmount)}
-                    placeholder="Amount"
+                    onChange={() => handleFromAmountChange(fromAmount)}
+                    placeholder="Converted Amount"
+                    disabled
                 />
                 <div className="currency-select">
                     <select value={to} onChange={(e) => handleToCurrencyChange(e.target.value)}>
