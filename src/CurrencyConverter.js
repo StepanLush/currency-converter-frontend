@@ -45,6 +45,8 @@ const CurrencyConverter = () => {
         if (activeInput === 'from' && fromAmount && rates[to] && rates[from]) {
             const converted = (fromAmount * rates[to] / rates[from]).toFixed(2);
             setToAmount(converted);
+        } else if (fromAmount === '') {
+            setToAmount('0');
         }
     }, [from, to, rates, fromAmount, activeInput]);
 
@@ -52,6 +54,8 @@ const CurrencyConverter = () => {
         if (activeInput === 'to' && toAmount && rates[to] && rates[from]) {
             const converted = (toAmount * rates[from] / rates[to]).toFixed(2);
             setFromAmount(converted);
+        } else if (toAmount === '') {
+            setFromAmount('0');
         }
     }, [from, to, rates, toAmount, activeInput]);
 
