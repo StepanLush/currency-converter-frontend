@@ -8,12 +8,13 @@ const CurrencyConverter = () => {
     const [from, setFrom] = useState(localStorage.getItem('fromCurrency') || 'USD');
     const [to, setTo] = useState(localStorage.getItem('toCurrency') || 'EUR');
     const [fromAmount, setFromAmount] = useState(localStorage.getItem('fromAmount') || '');
-    const [toAmount, setToAmount] = useState('');
+    const [toAmount, setToAmount] = useState('0');
     const [rates, setRates] = useState({});
     const [favorites, setFavorites] = useState(
         JSON.parse(localStorage.getItem('favorites')) || []
     );
     const [activeInput, setActiveInput] = useState('from');
+    const [decimalPlaces, setDecimalPlaces] = useState(2);
 
     useEffect(() => {
         const API_URL = `${process.env.REACT_APP_API_URL}/currencies`;
@@ -42,22 +43,30 @@ const CurrencyConverter = () => {
     }, [from, to, fromAmount, favorites]);
 
     useEffect(() => {
+        if (from === to) {
+            const temp = from;
+            setFrom(to);
+            setTo(temp);
+        }
+    }, [from, to]);
+
+    useEffect(() => {
         if (activeInput === 'from' && fromAmount && rates[to] && rates[from]) {
-            const converted = (fromAmount * rates[to] / rates[from]).toFixed(2);
+            const converted = (fromAmount * rates[to] / rates[from]).toFixed(decimalPlaces);
             setToAmount(converted);
         } else if (fromAmount === '') {
             setToAmount('0');
         }
-    }, [from, to, rates, fromAmount, activeInput]);
+    }, [from, to, rates, fromAmount, activeInput, decimalPlaces]);
 
     useEffect(() => {
         if (activeInput === 'to' && toAmount && rates[to] && rates[from]) {
-            const converted = (toAmount * rates[from] / rates[to]).toFixed(2);
+            const converted = (toAmount * rates[from] / rates[to]).toFixed(decimalPlaces);
             setFromAmount(converted);
         } else if (toAmount === '') {
             setFromAmount('0');
         }
-    }, [from, to, rates, toAmount, activeInput]);
+    }, [from, to, rates, toAmount, activeInput, decimalPlaces]);
 
     const handleAmountInput = (value) => {
         return value.replace(/[^0-9.]/g, '');
@@ -134,6 +143,17 @@ const CurrencyConverter = () => {
                         ★
                     </button>
                 </div>
+            </div>
+
+            <div className="input-group">
+                <label htmlFor="decimalPlaces">Decimal Places:</label>
+                <input
+                    type="number"
+                    id="decimalPlaces"
+                    value={decimalPlaces}
+                    onChange={(e) => setDecimalPlaces(Number(e.target.value) || 0)}
+                    min="0"
+                />
             </div>
 
             <p>Exchange Rate: {rates[to] && rates[from] ? (rates[to] / rates[from]).toFixed(4) : 'N/A'}</p>
