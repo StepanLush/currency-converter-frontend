@@ -23,9 +23,6 @@ const CurrencyConverter = () => {
                 const fetchedCurrencies = Object.keys(response.data.rates);
                 setCurrencies(fetchedCurrencies);
                 setRates(response.data.rates);
-                if (fromAmount) {
-                    handleFromAmountChange(fromAmount, response.data.rates);
-                }
             } catch (error) {
                 console.error('Error fetching currencies:', error);
             }
@@ -34,7 +31,7 @@ const CurrencyConverter = () => {
         fetchCurrencies();
         const intervalId = setInterval(fetchCurrencies, 5 * 60 * 1000); // Автообновление каждые 5 минут
         return () => clearInterval(intervalId);
-    }, [fromAmount]);
+    }, []);
 
     useEffect(() => {
         localStorage.setItem('fromCurrency', from);
@@ -43,18 +40,29 @@ const CurrencyConverter = () => {
         localStorage.setItem('favorites', JSON.stringify(favorites));
     }, [from, to, fromAmount, favorites]);
 
-    const handleAmountInput = (value, callback) => {
-        const sanitizedValue = value.replace(/[^0-9.]/g, '');
-        callback(sanitizedValue);
+    const handleAmountInput = (value) => {
+        return value.replace(/[^0-9.]/g, '');
     };
 
-    const handleFromAmountChange = (amount, currentRates = rates) => {
-        handleAmountInput(amount, setFromAmount);
-        if (amount && currentRates[to] && currentRates[from]) {
-            const converted = (amount * currentRates[to] / currentRates[from]).toFixed(2);
+    const handleFromAmountChange = (amount) => {
+        const sanitizedAmount = handleAmountInput(amount);
+        setFromAmount(sanitizedAmount);
+        if (sanitizedAmount && rates[to] && rates[from]) {
+            const converted = (sanitizedAmount * rates[to] / rates[from]).toFixed(2);
             setToAmount(converted);
         } else {
             setToAmount('');
+        }
+    };
+
+    const handleToAmountChange = (amount) => {
+        const sanitizedAmount = handleAmountInput(amount);
+        setToAmount(sanitizedAmount);
+        if (sanitizedAmount && rates[to] && rates[from]) {
+            const converted = (sanitizedAmount * rates[from] / rates[to]).toFixed(2);
+            setFromAmount(converted);
+        } else {
+            setFromAmount('');
         }
     };
 
@@ -79,7 +87,7 @@ const CurrencyConverter = () => {
     const handleToCurrencyChange = (currency) => {
         setTo(currency);
         if (toAmount) {
-            handleFromAmountChange(fromAmount);
+            handleToAmountChange(toAmount);
         }
     };
 
@@ -115,9 +123,8 @@ const CurrencyConverter = () => {
                 <input
                     type="text"
                     value={toAmount}
-                    onChange={() => handleFromAmountChange(fromAmount)}
+                    onChange={(e) => handleToAmountChange(e.target.value)}
                     placeholder="Converted Amount"
-                    disabled
                 />
                 <div className="currency-select">
                     <select value={to} onChange={(e) => handleToCurrencyChange(e.target.value)}>
