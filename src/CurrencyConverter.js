@@ -13,6 +13,7 @@ const CurrencyConverter = () => {
     const [favorites, setFavorites] = useState(
         JSON.parse(localStorage.getItem('favorites')) || []
     );
+    const [activeInput, setActiveInput] = useState('from');
 
     useEffect(() => {
         const API_URL = `${process.env.REACT_APP_API_URL}/currencies`;
@@ -41,28 +42,30 @@ const CurrencyConverter = () => {
     }, [from, to, fromAmount, favorites]);
 
     useEffect(() => {
-        if (fromAmount && rates[to] && rates[from]) {
+        if (activeInput === 'from' && fromAmount && rates[to] && rates[from]) {
             const converted = (fromAmount * rates[to] / rates[from]).toFixed(2);
             setToAmount(converted);
         }
-    }, [from, to, rates, fromAmount]);
+    }, [from, to, rates, fromAmount, activeInput]);
 
     useEffect(() => {
-        if (toAmount && rates[to] && rates[from]) {
+        if (activeInput === 'to' && toAmount && rates[to] && rates[from]) {
             const converted = (toAmount * rates[from] / rates[to]).toFixed(2);
             setFromAmount(converted);
         }
-    }, [from, to, rates, toAmount]);
+    }, [from, to, rates, toAmount, activeInput]);
 
     const handleAmountInput = (value) => {
         return value.replace(/[^0-9.]/g, '');
     };
 
     const handleFromAmountChange = (amount) => {
+        setActiveInput('from');
         setFromAmount(handleAmountInput(amount));
     };
 
     const handleToAmountChange = (amount) => {
+        setActiveInput('to');
         setToAmount(handleAmountInput(amount));
     };
 
